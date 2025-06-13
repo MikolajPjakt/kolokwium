@@ -11,4 +11,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Sprawdzenie działania
-        run: echo "Działa!"
+        run: echo "Działa!!"
