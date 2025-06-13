@@ -1,4 +1,4 @@
-name: Kolokwium CI/CD
+name: Kolokwium CI/CD Pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,62 +16,53 @@ jobs:
         with:
           node-version: '18'
       - run: npm install
-      - run: npm test
+      - run: npm run test
+      - run: npm run lint
 
-  lint:
+  build-image:
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - run: npm install
-      - run: npx eslint .
-
-  build:
-    needs: [test, lint]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: docker build -t myapp:latest .
-      - run: docker save myapp:latest | gzip > myapp.tar.gz
+      - run: docker build -t myapp:build .
+      - run: docker save myapp:build | gzip > myapp-image.tar.gz
       - uses: actions/upload-artifact@v3
         with:
-          name: docker-image
-          path: myapp.tar.gz
+          name: app-image
+          path: myapp-image.tar.gz
 
-  staging:
+  deploy-staging:
     if: github.ref == 'refs/heads/main'
-    needs: build
+    needs: build-image
     runs-on: ubuntu-latest
     environment:
       name: staging
-      url: https://example-staging-url.com
+      url: https://staging-example.com
     steps:
-      - run: echo "Czeka na akceptację..."
+      - run: echo "Waiting for staging approval..."
 
-  production:
+  deploy-production:
     if: github.ref == 'refs/heads/main'
-    needs: staging
+    needs: deploy-staging
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: docker-image
-      - run: gunzip -c myapp.tar.gz | docker load
+          name: app-image
+      - run: gunzip -c myapp-image.tar.gz | docker load
       - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - run: |
-          docker tag myapp:latest ${{ secrets.DOCKER_USERNAME }}/myapp:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+          docker tag myapp:build ${{ secrets.DOCKER_USERNAME }}/myapp:prod
+          docker push ${{ secrets.DOCKER_USERNAME }}/myapp:prod
 
-  notify:
-    needs: [production]
+  finalize:
+    needs: deploy-production
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Pipeline zakończony: $(date)" > report.txt
+      - run: echo "Pipeline finished at $(date)" > status.txt
       - uses: actions/upload-artifact@v3
         with:
-          name: raport-koncowy
-          path: report.txt
+          name: pipeline-status
+          path: status.txt
