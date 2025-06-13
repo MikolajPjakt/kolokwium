@@ -1,14 +1,30 @@
-import eslintConfigESLint from 'eslint-config-eslint';
-
 export default [
-  {
-    languageOptions: {
-      ecmaVersion: 2021,
-      sourceType: 'module', // Zmienione z 'commonjs' na 'module' bo package.json ma "type": "module"
-      globals: {
-        node: true,
+    {
+      languageOptions: {
+        ecmaVersion: 2021,
+        sourceType: 'module',
+        globals: {
+          node: true,
+        },
+      },
+      rules: {
+        // Podstawowe reguły ESLint
+        'no-unused-vars': 'error',
+        'no-undef': 'error',
+        'semi': ['error', 'always'],
+        'quotes': ['error', 'single'],
       },
     },
-  },
-  ...eslintConfigESLint, // Rozłożenie tablicy konfiguracji
-];
+    {
+      // Specjalna konfiguracja dla plików testowych
+      files: ['**/*.test.js', '**/*.spec.js'],
+      languageOptions: {
+        globals: {
+          describe: 'readonly',
+          test: 'readonly',
+          expect: 'readonly',
+          jest: 'readonly',
+        },
+      },
+    },
+  ];
