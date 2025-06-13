@@ -15,10 +15,11 @@
     "express": "^5.1.0"
   },
   "devDependencies": {
-    "eslint": "^9.28.0",
-    "jest": "^30.0.0",
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
-    "babel-jest": "^30.0.0"
+    "babel-jest": "^30.0.0",
+    "eslint": "^9.28.0",
+    "eslint-config-eslint": "^11.0.0",
+    "jest": "^30.0.0"
   }
 }
