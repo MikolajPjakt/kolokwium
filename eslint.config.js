@@ -1,14 +1,14 @@
-import recommended from 'eslint-config-eslint/recommended.js';
+import eslintConfigESLint from 'eslint-config-eslint';
 
 export default [
   {
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: 'commonjs',
+      sourceType: 'module', // Zmienione z 'commonjs' na 'module' bo package.json ma "type": "module"
       globals: {
         node: true,
       },
     },
   },
-  recommended, // Dodanie konfiguracji recommended jako osobnego elementu
+  ...eslintConfigESLint, // Rozłożenie tablicy konfiguracji
 ];
