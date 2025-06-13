@@ -1,20 +1,13 @@
 {
   "name": "kolokwium",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "jest",
     "lint": "eslint ."
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "express": "^5.1.0"
-  },
   "devDependencies": {
     "eslint": "^9.28.0",
-    "jest": "^30.0.0"
+    "jest": "^latest"
   }
 }
